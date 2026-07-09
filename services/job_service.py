@@ -13,7 +13,7 @@ logger = structlog.get_logger()
 async def create_job(
     db: AsyncSession,
     payload: dict,
-    priority: JobPriority = JobPriority.NORMAL,
+    priority: str = "NORMAL",
     max_retries: int = 5,
 ) -> JobModel:
     "Insert a new transaction and job row with PENDING status"
@@ -21,7 +21,7 @@ async def create_job(
     job = JobModel(
         id=uuid.uuid4(),
         payload=payload,
-        priority=priority,
+        priority=JobPriority.from_str(priority),
         status=JobState.PENDING,
         max_retries=max_retries,
         worker_id=None,

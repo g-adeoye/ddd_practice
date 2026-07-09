@@ -44,6 +44,20 @@ services:
       - 5432:5432
     networks:
       - queue
+
+  redis:
+    image: redis:latest
+    networks:
+      - queue
+    ports:
+     - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+
+
 volumes:
   db-data:
 

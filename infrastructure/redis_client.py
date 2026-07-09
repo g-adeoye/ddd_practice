@@ -22,7 +22,7 @@ async def create_redis_client() -> Redis:
     client = Redis.from_url(
         settings.redis_url,
         encoding="utf-8",
-        decode_response=True, # Returns strings instead of bytes
+        decode_responses=True, # Returns strings instead of bytes
     )
     try:
         await cast(Awaitable[bool], client.ping())

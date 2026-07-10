@@ -126,42 +126,32 @@ async def test_low_watermark_resumes_acceptance(client, redis):
 
     # Manually set the backpressure flag (simulates queue having been filled)
     await redis.set(BACKPRESSURE_STATE_KEY, "1", ex=60)
-    
+
     # Fill queue to just above LOW_WATERMARK, should still reject
     stream = QUEUE_NAMES["normal"]
     await _ensure_consumer_group(redis, stream)
-    
+
     pipeline = redis.pipeline()
     for i in range(settings.low_watermark + 10):
         pipeline.xadd(
-            stream, {
-                "job_id": f"fake-{i}",
-                "payload": "{}",
-                "priority": "normal"
-            }
+            stream, {"job_id": f"fake-{i}", "payload": "{}", "priority": "normal"}
         )
     await pipeline.execute()
-    
+
     response = await client.post(
-        "/jobs",
-        json={
-            "payload": {"type": "send_email"}, "priority": "normal"
-        }
+        "/jobs", json={"payload": {"type": "send_email"}, "priority": "normal"}
     )
     assert response.status_code == 503, "should still reject above watermark"
-    
+
     # Now drain the queue below low watermark
     await redis.delete(stream)
-    
+
     # should now accept (depth is 0, below the watermark)
     response = await client.post(
-        "/jobs",
-        json={
-            "payload": {"type": "send_email"}, "priority": "normal"
-        }
+        "/jobs", json={"payload": {"type": "send_email"}, "priority": "normal"}
     )
     assert response.status_code == 202, "should accept once below low watermark"
-    
+
     # Backpressure flag should be cleared
     still_active = await redis.exists(BACKPRESSURE_STATE_KEY)
     assert not still_active

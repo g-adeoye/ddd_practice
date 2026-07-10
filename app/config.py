@@ -16,6 +16,7 @@ class Settings:
     max_retries: int = 5
     job_timeout_seconds: int = 30
     app_env: str = "development"
+    worker_count: int = 4
 
 
 @lru_cache

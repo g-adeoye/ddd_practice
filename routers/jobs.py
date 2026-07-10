@@ -25,7 +25,7 @@ async def create_job(body: JobCreate, db: DbDep, redis: RedisDep) -> JobModel:
             db,
             payload=body.payload,
             priority=body.priority,
-            max_retries=body.max_retries
+            max_retries=body.max_retries,
         )
         await db.commit()
         await db.refresh(job)

@@ -11,6 +11,7 @@ SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 DbDep = Annotated[AsyncSession, Depends(get_db)]
 
+
 async def get_redis(request: Request) -> Redis:
     """
     Pull the Redis client from FastAPU app state.
@@ -18,5 +19,5 @@ async def get_redis(request: Request) -> Redis:
     """
     return cast(Redis, request.app.state.redis)
 
+
 RedisDep = Annotated[Redis, Depends(get_redis)]
-    

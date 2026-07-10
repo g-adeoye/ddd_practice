@@ -16,10 +16,11 @@ from routers import jobs, queues
 
 configure_logging()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.redis = await create_redis_client()
-    
+
     # Background task: update queue depth gauge every 15 seconds
     async def update_queue_depth_gauge() -> None:
         print("Metrics background task started...")
@@ -31,21 +32,22 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             except Exception as e:
                 print(f"Metrics task error: {e}")
             await asyncio.sleep(15)
-            
+
     import asyncio
-    
+
     gauge_task: asyncio.Task[None] = asyncio.create_task(update_queue_depth_gauge())
-    
+
     yield
-    
+
     gauge_task.cancel()
     await close_redis_client(app.state.redis)
+
 
 app = FastAPI(
     title="Async Job Queue",
     description="Job Queue with backpressure and priority scheduling",
     version="0.1.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Routers
@@ -56,6 +58,7 @@ app.include_router(queues.router)
 metrics_app = make_asgi_app(registry=REGISTRY)
 app.mount("/metrics", metrics_app)
 
+
 @app.get("/health", tags=["ops"])
 async def health(request: Request) -> JSONResponse:
     status = {
@@ -64,7 +67,7 @@ async def health(request: Request) -> JSONResponse:
         "postgres": "ok",
     }
     http_status = 200
-    
+
     # check redis
     try:
         await request.app.state.redis.ping()
@@ -72,17 +75,17 @@ async def health(request: Request) -> JSONResponse:
         status["redis"] = f"error: {e}"
         status["status"] = "degraded"
         http_status = 503
-        
+
     # check postgres
     try:
         # get a temporary connection from the pool
         async for session in get_db():
             await session.execute(text("SELECT 1"))
-            break # success
-        
+            break  # success
+
     except Exception as e:
         status["postgres"] = f"error: {e}"
         status["status"] = "degraded"
         http_status = 503
-        
+
     return JSONResponse(content=status, status_code=http_status)

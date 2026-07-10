@@ -10,7 +10,8 @@ class JobCreate(BaseModel):
 
     payload: dict[str, Any]
     priority: Literal["NORMAL", "HIGH", "CRITICAL"] = "NORMAL"
-
+    max_retries: int = 5
+    
     @field_validator("priority", mode="before")
     def to_upper(cls, v):
         return v.upper() if isinstance(v, str) else v

@@ -12,6 +12,8 @@ class InvalidAmount(DomainError):
     def __init__(self, message: str) -> None:
         super().__init__(message)
 
+
 class BackPressureError(Exception):
     "Queue depth exceeded the high watermark."
+
     pass

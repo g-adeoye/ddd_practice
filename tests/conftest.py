@@ -33,7 +33,8 @@ async def engine() -> AsyncGenerator[AsyncEngine, None]:
         await conn.run_sync(SQLModel.metadata.create_all)
     yield eng
     await eng.dispose()
-    
+
+
 @pytest.fixture(autouse=True, scope="function")
 async def reset_database(engine: AsyncEngine) -> AsyncGenerator[None, None]:
     "Truncate tables before each test."
@@ -43,12 +44,14 @@ async def reset_database(engine: AsyncEngine) -> AsyncGenerator[None, None]:
             query = f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"
             await conn.execute(text(query))
     yield
-    
+
+
 @pytest.fixture(autouse=True, scope="function")
 async def flush_redis(redis_client: Redis) -> AsyncGenerator[None, None]:
     "flush redis before each test."
     await redis_client.flushdb()
     yield
+
 
 @pytest.fixture(scope="session")
 async def redis_client() -> AsyncGenerator[Redis, None]:

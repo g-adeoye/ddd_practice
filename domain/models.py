@@ -46,7 +46,7 @@ class JobState(StrEnum):
     RUNNING = "RUNNING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
-    
+
     @staticmethod
     def from_str(label: str):
         label_class = {
@@ -56,31 +56,30 @@ class JobState(StrEnum):
             "FAILED": JobState.FAILED,
         }
         class_ = label_class[label]
-        
+
         if class_ is None:
             raise ValueError(f"Unknown status: {label}")
-        
+
         return class_
-    
 
 
 class JobPriority(StrEnum):
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
     NORMAL = "NORMAL"
-    
+
     @staticmethod
     def from_str(label: str):
         label_class = {
             "CRITICAL": JobPriority.CRITICAL,
             "HIGH": JobPriority.HIGH,
-            "NORMAL": JobPriority.NORMAL
+            "NORMAL": JobPriority.NORMAL,
         }
         class_ = label_class[label]
-        
+
         if class_ is None:
             raise ValueError(f"Unknown priority: {label}")
-        
+
         return class_
 
 

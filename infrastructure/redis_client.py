@@ -22,14 +22,15 @@ async def create_redis_client() -> Redis:
     client = Redis.from_url(
         settings.redis_url,
         encoding="utf-8",
-        decode_responses=True, # Returns strings instead of bytes
+        decode_responses=True,  # Returns strings instead of bytes
     )
     try:
         await cast(Awaitable[bool], client.ping())
     except RedisConnectionError as e:
         raise RuntimeError(f"Could not connect to Redis at {settings.redis_url}") from e
-    
+
     return client
+
 
 async def close_redis_client(client: Redis) -> None:
     "Called once during app shutdown to release the connection pool."

@@ -5,7 +5,7 @@ from db.models import JobModel
 import uuid
 from sqlalchemy import select, update
 from sqlmodel import col
-from datetime import datetime, UTC
+from datetime import datetime
 
 logger = structlog.get_logger()
 
@@ -47,7 +47,7 @@ async def mark_running(db: AsyncSession, job_id: uuid.UUID, worker_id: str) -> N
         update(JobModel)
         .where(col(JobModel.id) == job_id, col(JobModel.status) == JobState.PENDING)
         .values(
-            status=JobState.RUNNING, worker_id=worker_id, heartbeat_at=datetime.now(UTC)
+            status=JobState.RUNNING, worker_id=worker_id, heartbeat_at=datetime.now()
         )
     )
 
@@ -83,7 +83,7 @@ async def update_heartbeat(db: AsyncSession, job_id: uuid.UUID) -> None:
     await db.execute(
         update(JobModel)
         .where(col(JobModel.id) == job_id)
-        .values(heartbeat_at=datetime.now(UTC))
+        .values(heartbeat_at=datetime.now())
     )
 
 

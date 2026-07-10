@@ -22,7 +22,7 @@ queue_depth = Gauge(
 jobs_processed_total = Counter(
     "jobs_processed_total",
     "Total number of jobs processed by workers",
-    labelnames=["status"], # completed | failed
+    labelnames=["status"],  # completed | failed
 )
 
 backpressure_rejection_total = Counter(
